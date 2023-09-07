@@ -1,56 +1,39 @@
-import { mkdir } from 'node:fs';
-import axios from 'axios';
-import cheerio from 'cheerio';
+import fs from 'node:fs';
+import fetch from 'node-fetch';
 
-// Create directory
-mkdir('./meme', function (err) {
-  if (err) {
-    console.log(err);
-  } else {
-    console.log('Created directory');
-  }
-});
+// import axios from 'axios';
 
-/* async function getForum() {
-  try {
-    const response = await axios.get(
-      'https://memegen-link-examples-upleveled.netlify.app/',
-    );
-    console.log(response.data);
-  } catch (error) {
-    console.error(error);
+// import { load } from 'cheerio';
+
+// Create a Folder
+const folderName = './meme';
+try {
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName);
   }
+} catch (err) {
+  console.error(err);
 }
-const htmlData = getForum();
-console.log(htmlData); */
 
-const getImgUrls = async () => {
-  try {
-    const { data } = await axios.get(
-      'https://memegen-link-examples-upleveled.netlify.app/',
-    );
-    const $ = cheerio.load(data);
-    const imgUrls = [];
+const response = await fetch(
+  'https://memegen-link-examples-upleveled.netlify.app/',
+);
+// response to text request
+const data = await response.text();
 
-    $('img').each((_idx, el) => {
-      const imgUrl = $(el).attr('src');
-      if (imgUrl) {
-        imgUrls.push(imgUrl);
+const urlPattern = /https:\/\/api\.memegen\.link[^ ]+/g;
+const arr = data.match(urlPattern) || [];
+const urls = arr.slice(1, 11).map((url) => url.trim());
+
+urls.map(async (file) => {
+  await fetch(file).then((res) => {
+    const fileName = function (index) {
+      if (index === 10) {
+        `{10.jpg`;
+      } else {
+        `${index + 1}.jpg`;
       }
-    });
-
-    return imgUrls;
-  } catch (error) {
-    throw error;
-  }
-};
-
-getImgUrls().then((imgUrls) => console.log(imgUrls));
-
-/* await axios({
-  method: 'get',
-  url: 'https://memegen-link-examples-upleveled.netlify.app/',
-  responseType: 'stream',
-}).then(function (response) {
-  response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'));
-}); */
+    };
+    response.body.pipe(fs.createWriteStream(`./meme/${fileName}`));
+  });
+});
