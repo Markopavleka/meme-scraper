@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 
 // import { load } from 'cheerio';
 
-// Create a Folder
+// create a Folder
 const folderName = './meme';
 try {
   if (!fs.existsSync(folderName)) {
@@ -21,19 +21,29 @@ const response = await fetch(
 // response to text request
 const data = await response.text();
 
+// filter the urls
 const urlPattern = /https:\/\/api\.memegen\.link[^ ]+/g;
 const arr = data.match(urlPattern) || [];
 const urls = arr.slice(1, 11).map((url) => url.trim());
 
-urls.map(async (file) => {
-  await fetch(file).then((res) => {
-    const fileName = function (index) {
+// download the files
+const downloadFiles = () => {
+  urls.forEach(async (url, index) => {
+    try {
+      const res = await fetch(url);
+      let fileName;
       if (index === 10) {
-        `{10.jpg`;
+        fileName = '10.jpg';
       } else {
-        `${index + 1}.jpg`;
-      }
-    };
-    response.body.pipe(fs.createWriteStream(`./meme/${fileName}`));
+        fileName = `${(index + 1).toString().padStart(2, '0')}.jpg`;
+      } // store the files in meme
+      const writeStream = fs.createWriteStream(`./meme/${fileName}`);
+      res.body.pipe(writeStream);
+      console.log(`Downloaded: ${fileName}`);
+    } catch (error) {
+      console.error(`Error downloading ${url}: ${error}`);
+    }
   });
-});
+};
+
+downloadFiles();
