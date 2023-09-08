@@ -1,10 +1,6 @@
 import fs from 'node:fs';
 import fetch from 'node-fetch';
 
-// import axios from 'axios';
-
-// import { load } from 'cheerio';
-
 // create a Folder
 const folderName = './meme';
 try {
@@ -22,9 +18,12 @@ const response = await fetch(
 const data = await response.text();
 
 // filter the urls
-const urlPattern = /https:\/\/api\.memegen\.link[^ ]+/g;
-const arr = data.match(urlPattern) || [];
-const urls = arr.slice(1, 11).map((url) => url.trim());
+const urlPattern = /https:\/\/api\.memegen\.link[^ "]+/g;
+const arr = data.match(urlPattern);
+const urls = arr.slice(1, 21).map((url) => url.trim());
+let i = urls.length;
+
+while (i--) (i + 1) % 2 === 0 && urls.splice(i, 1);
 
 // download the files
 const downloadFiles = () => {
