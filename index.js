@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import fetch from 'node-fetch';
 
 // create a Folder
-const folderName = './meme';
+const folderName = './memes';
 try {
   if (!fs.existsSync(folderName)) {
     fs.mkdirSync(folderName);
