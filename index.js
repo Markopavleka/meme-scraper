@@ -36,7 +36,7 @@ const downloadFiles = () => {
       } else {
         fileName = `${(index + 1).toString().padStart(2, '0')}.jpg`;
       } // store the files in meme
-      const writeStream = fs.createWriteStream(`./meme/${fileName}`);
+      const writeStream = fs.createWriteStream(`./memes/${fileName}`);
       res.body.pipe(writeStream);
       console.log(`Downloaded: ${fileName}`);
     } catch (error) {
